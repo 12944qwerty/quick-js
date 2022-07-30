@@ -100,16 +100,22 @@ module.exports = class Settings extends React.PureComponent {
         >Toggle mute for all servers you're in</SwitchItem>
         <SwitchItem
           onChange={() => {
-            toggleSetting('get-badges');
-            if (getSetting('get-badges', false)) {
-              Object.defineProperty(getCurrentUser(), 'flags', { get: () => -1 });
+            toggleSetting('get-flags');
+            if (getSetting('get-flags', false)) {
+              createAlertModal("Enable all flags?", "Enabling all flags may cause some features to break, and this plugin is not responsible for any crashes or errors that arise from toggling this feature. Continue?").then(res => {
+                if (res) {
+                  Object.defineProperty(getCurrentUser(), 'flags', { get: () => -1 });
+                } else {
+                  toggleSetting('get-flags');
+                }
+              })
             } else {
               Object.defineProperty(getCurrentUser(), 'flags', { get: () => null });
             }
           }}
-          value={getSetting('get-badges', false)}
-          note="Give yourself every Discord badge. This is client-side only, meaning no one else can see them."
-        >Toggle all badges</SwitchItem>
+          value={getSetting('get-flags', false)}
+          note="Give yourself every Discord flag, which can also give you every available badge. This is client-side only and may cause issues with some features."
+        >Toggle all flags</SwitchItem>
         <SwitchItem
           onChange={() => toggleSetting('remove-gif')}
           value={getSetting('remove-gif', false)}
@@ -165,7 +171,7 @@ module.exports = class Settings extends React.PureComponent {
           onChange={(serverid) => {
             serverid = serverid.trim();
 
-            if (/^[0-9]{18}$/m.test(serverid)) {
+            if (/^[0-9]{18,19}$/m.test(serverid)) {
               createPromptModal("Enter the Guild feature that you would like to add").then(feature => feature.toUpperCase().trim()).then(feature => {
                 // This if statement check can be uncommented and it will only allow VERIFIED or PARTNERED.
                 // if (feature === 'VERIFIED' || feature === 'PARTNERED') {
@@ -185,7 +191,7 @@ module.exports = class Settings extends React.PureComponent {
               });
             }
           }}
-        >Allows you to add features to a Guild. You can find an <b>incomplete</b> list here: <a class="anchor-1MIwyf anchorUnderlineOnHover-2qPutX cta" href="https://gist.github.com/Techy/ecc60b12e94f8fc8185f09b82aa91dd2" rel="noreferrer noopener" target="_blank" role="button" tabindex="0">https://gist.github.com/Techy/ecc60b12e94f8fc8185f09b82aa91dd2</a></TextInput>
+        >Allows you to add features to a Guild. You can find a list here: <a class="anchor-1MIwyf anchorUnderlineOnHover-2qPutX cta" href="https://discord.com/developers/docs/resources/guild#guild-object-guild-features" rel="noreferrer noopener" target="_blank" role="button" tabindex="0">https://discord.com/developers/docs/resources/guild#guild-object-guild-features</a></TextInput>
       </div>
     );
   }
